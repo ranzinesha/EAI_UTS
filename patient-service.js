@@ -40,7 +40,7 @@ app.post('/api/patients', (req, res) => {
   );
 });
 
-// UPDATE — was missing
+// UPDATE 
 app.put('/api/patients/:id', (req, res) => {
   const id = req.params.id;
   const { name, age } = req.body;
@@ -55,7 +55,7 @@ app.put('/api/patients/:id', (req, res) => {
   );
 });
 
-// DELETE — was missing
+// DELETE 
 app.delete('/api/patients/:id', (req, res) => {
   const id = req.params.id;
 

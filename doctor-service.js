@@ -27,7 +27,7 @@ app.get('/api/doctors/:id', (req, res) => {
   });
 });
 
-// CREATE — fixed: now saves specialty too
+// CREATE 
 app.post('/api/doctors', (req, res) => {
   const { name, specialty } = req.body;
   db.query(
