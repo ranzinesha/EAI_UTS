@@ -5,7 +5,9 @@ const swaggerJsdoc = require('swagger-jsdoc');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: '*'
+}));
 app.use(express.json());
 
 // SWAGGER CONFIG
