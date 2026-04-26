@@ -14,16 +14,30 @@ const db = mysql.createConnection({
 // GET ALL
 app.get('/api/doctors', (req, res) => {
   db.query('SELECT * FROM doctors', (err, result) => {
+    if (err) return res.status(500).send(err);
     res.json(result);
   });
 });
 
-// CREATE
-app.post('/api/doctors', (req, res) => {
-  const { name } = req.body;
-  db.query('INSERT INTO doctors (name) VALUES (?)', [name], () => {
-    res.json({ message: 'Doctor added' });
+// GET BY ID
+app.get('/api/doctors/:id', (req, res) => {
+  db.query('SELECT * FROM doctors WHERE id=?', [req.params.id], (err, result) => {
+    if (err) return res.status(500).send(err);
+    res.json(result[0]);
   });
+});
+
+// CREATE — fixed: now saves specialty too
+app.post('/api/doctors', (req, res) => {
+  const { name, specialty } = req.body;
+  db.query(
+    'INSERT INTO doctors (name, specialty) VALUES (?, ?)',
+    [name, specialty],
+    (err) => {
+      if (err) return res.status(500).send(err);
+      res.json({ message: 'Doctor added' });
+    }
+  );
 });
 
 // AVAILABILITY
@@ -53,7 +67,7 @@ app.get('/api/doctors/:id/availability', (req, res) => {
   );
 });
 
-// PUT DOCTOR
+// UPDATE
 app.put('/api/doctors/:id', (req, res) => {
   const id = req.params.id;
   const { name, specialty } = req.body;
@@ -63,12 +77,12 @@ app.put('/api/doctors/:id', (req, res) => {
     [name, specialty, id],
     (err) => {
       if (err) return res.status(500).send(err);
-      res.send('Doctor updated');
+      res.json({ message: 'Doctor updated' });
     }
   );
 });
 
-// DELETE DOCTOR
+// DELETE
 app.delete('/api/doctors/:id', (req, res) => {
   const id = req.params.id;
 
@@ -77,9 +91,9 @@ app.delete('/api/doctors/:id', (req, res) => {
     [id],
     (err) => {
       if (err) return res.status(500).send(err);
-      res.send('Doctor deleted');
+      res.json({ message: 'Doctor deleted' });
     }
   );
 });
 
-app.listen(3002, () => console.log('Doctor Service running'));
+app.listen(3002, () => console.log('Doctor Service running on port 3002'));

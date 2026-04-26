@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Smart Healthcare System</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface2: #1e2530;
+      --border: #30363d;
+      --accent: #2ea043;
+      --accent2: #58a6ff;
+      --red: #f85149;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --radius: 10px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      height: 60px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    header h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.25rem;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    header span {
+      font-size: 0.75rem;
+      background: rgba(46,160,67,0.15);
+      color: var(--accent);
+      border: 1px solid rgba(46,160,67,0.3);
+      padding: 2px 10px;
+      border-radius: 20px;
+    }
+
+    .layout {
+      display: flex;
+      min-height: calc(100vh - 60px);
+    }
+
+    nav {
+      width: 220px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 1.5rem 0;
+      flex-shrink: 0;
+    }
+
+    nav .nav-label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      padding: 0 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+
+    nav button {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      width: 100%;
+      padding: 0.625rem 1.25rem;
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.875rem;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s;
+      border-left: 2px solid transparent;
+    }
+
+    nav button:hover { color: var(--text); background: var(--surface2); }
+    nav button.active { color: var(--text); border-left-color: var(--accent2); background: var(--surface2); }
+
+    nav .icon { font-size: 1rem; width: 20px; text-align: center; }
+
+    main {
+      flex: 1;
+      padding: 2rem;
+      overflow-y: auto;
+    }
+
+    .page { display: none; }
+    .page.active { display: block; }
+
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+
+    .page-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.5rem;
+      letter-spacing: -0.02em;
+    }
+
+    .btn {
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius);
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: #3fb950; }
+    .btn-danger { background: rgba(248,81,73,0.15); color: var(--red); border: 1px solid rgba(248,81,73,0.3); }
+    .btn-danger:hover { background: rgba(248,81,73,0.25); }
+    .btn-edit { background: rgba(88,166,255,0.12); color: var(--accent2); border: 1px solid rgba(88,166,255,0.25); }
+    .btn-edit:hover { background: rgba(88,166,255,0.2); }
+    .btn-sm { padding: 0.3rem 0.75rem; font-size: 0.8rem; }
+    .btn-outline { background: none; border: 1px solid var(--border); color: var(--text); }
+    .btn-outline:hover { border-color: var(--muted); }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      font-size: 0.875rem;
+    }
+
+    thead { background: var(--surface2); }
+    th {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-weight: 600;
+      color: var(--muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--surface2); }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .badge-green { background: rgba(46,160,67,0.15); color: var(--accent); border: 1px solid rgba(46,160,67,0.3); }
+    .badge-red { background: rgba(248,81,73,0.12); color: var(--red); border: 1px solid rgba(248,81,73,0.25); }
+    .badge-blue { background: rgba(88,166,255,0.12); color: var(--accent2); border: 1px solid rgba(88,166,255,0.25); }
+
+    .actions { display: flex; gap: 0.5rem; }
+
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.75rem;
+      width: 420px;
+      max-width: 95vw;
+    }
+
+    .modal h3 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.125rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .form-group { margin-bottom: 1rem; }
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 0.375rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 0.6rem 0.875rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.875rem;
+      transition: border-color 0.15s;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--accent2);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: flex-end;
+      margin-top: 1.25rem;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.75rem 1.25rem;
+      font-size: 0.875rem;
+      z-index: 300;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.success { border-color: rgba(46,160,67,0.5); color: var(--accent); }
+    .toast.error { border-color: rgba(248,81,73,0.4); color: var(--red); }
+
+    .empty {
+      text-align: center;
+      padding: 3rem;
+      color: var(--muted);
+      font-size: 0.875rem;
+    }
+
+    /* History table */
+    .history-table td:last-child {
+      font-style: italic;
+      color: var(--muted);
+    }
+
+    .stat-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+    }
+
+    .stat-card .label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-card .value {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2rem;
+      letter-spacing: -0.03em;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>⚕ Healthcare System</h1>
+  <span>API Connected</span>
+</header>
+
+<div class="layout">
+  <nav>
+    <div class="nav-label">Menu</div>
+    <button class="active" onclick="showPage('dashboard', this)"><span class="icon">🏠</span> Dashboard</button>
+    <button onclick="showPage('patients', this)"><span class="icon">🧑‍⚕️</span> Patients</button>
+    <button onclick="showPage('doctors', this)"><span class="icon">👨‍⚕️</span> Doctors</button>
+    <button onclick="showPage('appointments', this)"><span class="icon">📅</span> Appointments</button>
+    <button onclick="showPage('records', this)"><span class="icon">📋</span> Records</button>
+    <button onclick="showPage('history', this)"><span class="icon">🕑</span> History</button>
+  </nav>
+
+  <main>
+
+    <!-- DASHBOARD -->
+    <div id="page-dashboard" class="page active">
+      <div class="page-header">
+        <h2 class="page-title">Dashboard</h2>
+      </div>
+      <div class="stat-cards">
+        <div class="stat-card">
+          <div class="label">Patients</div>
+          <div class="value" id="stat-patients">–</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Doctors</div>
+          <div class="value" id="stat-doctors">–</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Appointments</div>
+          <div class="value" id="stat-appointments">–</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Records</div>
+          <div class="value" id="stat-records">–</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PATIENTS -->
+    <div id="page-patients" class="page">
+      <div class="page-header">
+        <h2 class="page-title">Patients</h2>
+        <button class="btn btn-primary" onclick="openModal('patient')">+ Add Patient</button>
+      </div>
+      <table>
+        <thead><tr><th>ID</th><th>Name</th><th>Age</th><th>Actions</th></tr></thead>
+        <tbody id="patients-body"><tr><td colspan="4" class="empty">Loading...</td></tr></tbody>
+      </table>
+    </div>
+
+    <!-- DOCTORS -->
+    <div id="page-doctors" class="page">
+      <div class="page-header">
+        <h2 class="page-title">Doctors</h2>
+        <button class="btn btn-primary" onclick="openModal('doctor')">+ Add Doctor</button>
+      </div>
+      <table>
+        <thead><tr><th>ID</th><th>Name</th><th>Specialty</th><th>Availability</th><th>Actions</th></tr></thead>
+        <tbody id="doctors-body"><tr><td colspan="5" class="empty">Loading...</td></tr></tbody>
+      </table>
+    </div>
+
+    <!-- APPOINTMENTS -->
+    <div id="page-appointments" class="page">
+      <div class="page-header">
+        <h2 class="page-title">Appointments</h2>
+        <button class="btn btn-primary" onclick="openModal('appointment')">+ Create Appointment</button>
+      </div>
+      <table>
+        <thead><tr><th>ID</th><th>Patient ID</th><th>Doctor ID</th><th>Actions</th></tr></thead>
+        <tbody id="appointments-body"><tr><td colspan="4" class="empty">Loading...</td></tr></tbody>
+      </table>
+    </div>
+
+    <!-- RECORDS -->
+    <div id="page-records" class="page">
+      <div class="page-header">
+        <h2 class="page-title">Medical Records</h2>
+        <button class="btn btn-primary" onclick="openModal('record')">+ Add Record</button>
+      </div>
+      <table>
+        <thead><tr><th>ID</th><th>Patient ID</th><th>Diagnosis</th><th>Actions</th></tr></thead>
+        <tbody id="records-body"><tr><td colspan="4" class="empty">Loading...</td></tr></tbody>
+      </table>
+    </div>
+
+    <!-- HISTORY -->
+    <div id="page-history" class="page">
+      <div class="page-header">
+        <h2 class="page-title">Full History</h2>
+        <button class="btn btn-outline" onclick="loadHistory()">↻ Refresh</button>
+      </div>
+      <table class="history-table">
+        <thead><tr><th>Appointment ID</th><th>Patient</th><th>Doctor</th><th>Diagnosis</th></tr></thead>
+        <tbody id="history-body"><tr><td colspan="4" class="empty">Loading...</td></tr></tbody>
+      </table>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal">
+    <h3 id="modal-title">Add</h3>
+    <div id="modal-body"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" id="modal-submit" onclick="submitModal()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const API = 'http://localhost:3000/api';
+  let modalType = '', modalId = null;
+
+  // ── NAVIGATION ──────────────────────────────────────────────────
+  function showPage(name, btn) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+    btn.classList.add('active');
+    loadPage(name);
+  }
+
+  function loadPage(name) {
+    if (name === 'dashboard') loadDashboard();
+    else if (name === 'patients') loadPatients();
+    else if (name === 'doctors') loadDoctors();
+    else if (name === 'appointments') loadAppointments();
+    else if (name === 'records') loadRecords();
+    else if (name === 'history') loadHistory();
+  }
+
+  // ── TOAST ────────────────────────────────────────────────────────
+  function toast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show ' + type;
+    setTimeout(() => t.className = 'toast', 2800);
+  }
+
+  // ── API HELPERS ──────────────────────────────────────────────────
+  async function api(method, path, body) {
+    const res = await fetch(API + path, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: body ? JSON.stringify(body) : undefined
+    });
+    return res.json().catch(() => ({}));
+  }
+
+  // ── DASHBOARD ────────────────────────────────────────────────────
+  async function loadDashboard() {
+    const [patients, doctors, appointments, records] = await Promise.all([
+      fetch(API + '/patients').then(r => r.json()).catch(() => []),
+      fetch(API + '/doctors').then(r => r.json()).catch(() => []),
+      fetch(API + '/appointments').then(r => r.json()).catch(() => []),
+      fetch(API + '/records').then(r => r.json()).catch(() => []),
+    ]);
+    document.getElementById('stat-patients').textContent = patients.length ?? '–';
+    document.getElementById('stat-doctors').textContent = doctors.length ?? '–';
+    document.getElementById('stat-appointments').textContent = appointments.length ?? '–';
+    document.getElementById('stat-records').textContent = records.length ?? '–';
+  }
+
+  // ── PATIENTS ─────────────────────────────────────────────────────
+  async function loadPatients() {
+    const data = await fetch(API + '/patients').then(r => r.json()).catch(() => []);
+    const tbody = document.getElementById('patients-body');
+    if (!data.length) { tbody.innerHTML = '<tr><td colspan="4" class="empty">No patients found</td></tr>'; return; }
+    tbody.innerHTML = data.map(p => `
+      <tr>
+        <td><span class="badge badge-blue">#${p.id}</span></td>
+        <td>${p.name}</td>
+        <td>${p.age}</td>
+        <td><div class="actions">
+          <button class="btn btn-edit btn-sm" onclick="openModal('patient', ${p.id}, '${p.name}', ${p.age})">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteItem('/patients/${p.id}', loadPatients)">Delete</button>
+        </div></td>
+      </tr>`).join('');
+  }
+
+  // ── DOCTORS ──────────────────────────────────────────────────────
+  async function loadDoctors() {
+    const data = await fetch(API + '/doctors').then(r => r.json()).catch(() => []);
+    const tbody = document.getElementById('doctors-body');
+    if (!data.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty">No doctors found</td></tr>'; return; }
+
+    // Fetch availability for each doctor
+    const avail = await Promise.all(
+      data.map(d => fetch(API + `/doctors/${d.id}/availability`).then(r => r.json()).catch(() => ({ available: null })))
+    );
+
+    tbody.innerHTML = data.map((d, i) => `
+      <tr>
+        <td><span class="badge badge-blue">#${d.id}</span></td>
+        <td>${d.name}</td>
+        <td>${d.specialty || '–'}</td>
+        <td>${avail[i].available === true
+          ? '<span class="badge badge-green">● Available</span>'
+          : avail[i].available === false
+            ? '<span class="badge badge-red">● Busy</span>'
+            : '–'}</td>
+        <td><div class="actions">
+          <button class="btn btn-edit btn-sm" onclick="openModal('doctor', ${d.id}, '${d.name}', '${d.specialty || ''}')">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteItem('/doctors/${d.id}', loadDoctors)">Delete</button>
+        </div></td>
+      </tr>`).join('');
+  }
+
+  // ── APPOINTMENTS ─────────────────────────────────────────────────
+  async function loadAppointments() {
+    const data = await fetch(API + '/appointments').then(r => r.json()).catch(() => []);
+    const tbody = document.getElementById('appointments-body');
+    if (!data.length) { tbody.innerHTML = '<tr><td colspan="4" class="empty">No appointments found</td></tr>'; return; }
+    tbody.innerHTML = data.map(a => `
+      <tr>
+        <td><span class="badge badge-blue">#${a.id}</span></td>
+        <td>Patient #${a.patient_id}</td>
+        <td>Doctor #${a.doctor_id}</td>
+        <td><div class="actions">
+          <button class="btn btn-edit btn-sm" onclick="openModal('appointment', ${a.id}, ${a.patient_id}, ${a.doctor_id})">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteItem('/appointments/${a.id}', loadAppointments)">Delete</button>
+        </div></td>
+      </tr>`).join('');
+  }
+
+  // ── RECORDS ──────────────────────────────────────────────────────
+  async function loadRecords() {
+    const data = await fetch(API + '/records').then(r => r.json()).catch(() => []);
+    const tbody = document.getElementById('records-body');
+    if (!data.length) { tbody.innerHTML = '<tr><td colspan="4" class="empty">No records found</td></tr>'; return; }
+    tbody.innerHTML = data.map(r => `
+      <tr>
+        <td><span class="badge badge-blue">#${r.id}</span></td>
+        <td>Patient #${r.patient_id}</td>
+        <td>${r.diagnosis}</td>
+        <td><div class="actions">
+          <button class="btn btn-edit btn-sm" onclick="openModal('record', ${r.id}, ${r.patient_id}, '${r.diagnosis}')">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteItem('/records/${r.id}', loadRecords)">Delete</button>
+        </div></td>
+      </tr>`).join('');
+  }
+
+  // ── HISTORY ──────────────────────────────────────────────────────
+  async function loadHistory() {
+    const data = await fetch(API + '/history').then(r => r.json()).catch(() => []);
+    const tbody = document.getElementById('history-body');
+    if (!data.length) { tbody.innerHTML = '<tr><td colspan="4" class="empty">No history available</td></tr>'; return; }
+    tbody.innerHTML = data.map(h => `
+      <tr>
+        <td><span class="badge badge-blue">#${h.appointment_id}</span></td>
+        <td>${h.patient_name}</td>
+        <td>${h.doctor_name}</td>
+        <td>${h.diagnosis || '<span style="color:var(--muted)">No diagnosis</span>'}</td>
+      </tr>`).join('');
+  }
+
+  // ── MODAL ────────────────────────────────────────────────────────
+  function openModal(type, id, a, b) {
+    modalType = type; modalId = id || null;
+    const overlay = document.getElementById('modal-overlay');
+    const title = document.getElementById('modal-title');
+    const body = document.getElementById('modal-body');
+
+    if (type === 'patient') {
+      title.textContent = id ? 'Edit Patient' : 'Add Patient';
+      body.innerHTML = `
+        <div class="form-group"><label>Name</label><input id="f-name" placeholder="Full name" value="${id ? a : ''}"/></div>
+        <div class="form-group"><label>Age</label><input id="f-age" type="number" placeholder="Age" value="${id ? b : ''}"/></div>`;
+    } else if (type === 'doctor') {
+      title.textContent = id ? 'Edit Doctor' : 'Add Doctor';
+      body.innerHTML = `
+        <div class="form-group"><label>Name</label><input id="f-name" placeholder="Doctor name" value="${id ? a : ''}"/></div>
+        <div class="form-group"><label>Specialty</label><input id="f-specialty" placeholder="e.g. Cardiology" value="${id ? b : ''}"/></div>`;
+    } else if (type === 'appointment') {
+      title.textContent = id ? 'Edit Appointment' : 'Create Appointment';
+      body.innerHTML = `
+        <div class="form-group"><label>Patient ID</label><input id="f-patient" type="number" placeholder="Patient ID" value="${id ? a : ''}"/></div>
+        <div class="form-group"><label>Doctor ID</label><input id="f-doctor" type="number" placeholder="Doctor ID" value="${id ? b : ''}"/></div>`;
+    } else if (type === 'record') {
+      title.textContent = id ? 'Edit Record' : 'Add Medical Record';
+      body.innerHTML = `
+        <div class="form-group"><label>Patient ID</label><input id="f-patient" type="number" placeholder="Patient ID" value="${id ? a : ''}"/></div>
+        <div class="form-group"><label>Diagnosis</label><input id="f-diagnosis" placeholder="Diagnosis" value="${id ? b : ''}"/></div>`;
+    }
+
+    overlay.classList.add('open');
+    setTimeout(() => body.querySelector('input')?.focus(), 50);
+  }
+
+  function closeModal(e) {
+    if (e && e.target !== document.getElementById('modal-overlay')) return;
+    document.getElementById('modal-overlay').classList.remove('open');
+  }
+
+  async function submitModal() {
+    let path, body, method, reload;
+
+    if (modalType === 'patient') {
+      const name = document.getElementById('f-name').value.trim();
+      const age = parseInt(document.getElementById('f-age').value);
+      if (!name || !age) { toast('Fill in all fields', 'error'); return; }
+      body = { name, age };
+      path = modalId ? `/patients/${modalId}` : '/patients';
+      method = modalId ? 'PUT' : 'POST';
+      reload = loadPatients;
+    } else if (modalType === 'doctor') {
+      const name = document.getElementById('f-name').value.trim();
+      const specialty = document.getElementById('f-specialty').value.trim();
+      if (!name) { toast('Name is required', 'error'); return; }
+      body = { name, specialty };
+      path = modalId ? `/doctors/${modalId}` : '/doctors';
+      method = modalId ? 'PUT' : 'POST';
+      reload = loadDoctors;
+    } else if (modalType === 'appointment') {
+      const patient_id = parseInt(document.getElementById('f-patient').value);
+      const doctor_id = parseInt(document.getElementById('f-doctor').value);
+      if (!patient_id || !doctor_id) { toast('Fill in all fields', 'error'); return; }
+      body = { patient_id, doctor_id };
+      path = modalId ? `/appointments/${modalId}` : '/appointments';
+      method = modalId ? 'PUT' : 'POST';
+      reload = loadAppointments;
+    } else if (modalType === 'record') {
+      const patient_id = parseInt(document.getElementById('f-patient').value);
+      const diagnosis = document.getElementById('f-diagnosis').value.trim();
+      if (!patient_id || !diagnosis) { toast('Fill in all fields', 'error'); return; }
+      body = { patient_id, diagnosis };
+      path = modalId ? `/records/${modalId}` : '/records';
+      method = modalId ? 'PUT' : 'POST';
+      reload = loadRecords;
+    }
+
+    try {
+      await api(method, path, body);
+      document.getElementById('modal-overlay').classList.remove('open');
+      toast(modalId ? 'Updated successfully' : 'Added successfully');
+      reload();
+    } catch (e) {
+      toast('Request failed', 'error');
+    }
+  }
+
+  async function deleteItem(path, reload) {
+    if (!confirm('Delete this item?')) return;
+    try {
+      await api('DELETE', path);
+      toast('Deleted successfully');
+      reload();
+    } catch (e) {
+      toast('Delete failed', 'error');
+    }
+  }
+
+  // ── INIT ─────────────────────────────────────────────────────────
+  loadDashboard();
+</script>
+</body>
+</html>

@@ -8,14 +8,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// 🔥 SWAGGER CONFIG
+// SWAGGER CONFIG
 const options = {
   definition: {
     openapi: '3.0.0',
     info: {
       title: 'Healthcare API',
       version: '1.0.0',
-      description: 'API Documentation for Healthcare System'
+      description: 'API Documentation for Smart Healthcare System'
     },
     servers: [
       {
@@ -46,9 +46,22 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
  *     tags: [Patients]
  *     responses:
  *       200:
- *         description: Success
+ *         description: List of all patients
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                   name:
+ *                     type: string
+ *                   age:
+ *                     type: integer
  *   post:
- *     summary: Add patient
+ *     summary: Add a new patient
  *     tags: [Patients]
  *     requestBody:
  *       required: true
@@ -56,15 +69,21 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - name
+ *               - age
  *             properties:
  *               name:
  *                 type: string
+ *                 example: John Doe
  *               age:
  *                 type: integer
+ *                 example: 35
  *     responses:
  *       200:
- *         description: Patient added
+ *         description: Patient added successfully
  */
+
 /**
  * @swagger
  * /api/patients/{id}:
@@ -80,20 +99,16 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
  *         description: Patient ID
  *     responses:
  *       200:
- *         description: Success
- */
-/**
- * @swagger
- * /api/doctors:
- *   get:
- *     summary: Get all doctors
- *     tags: [Doctors]
- *     responses:
- *       200:
- *         description: Success
- *   post:
- *     summary: Add doctor
- *     tags: [Doctors]
+ *         description: Patient data
+ *   put:
+ *     summary: Update patient
+ *     tags: [Patients]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
  *     requestBody:
  *       required: true
  *       content:
@@ -103,12 +118,73 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
  *             properties:
  *               name:
  *                 type: string
- *               specialty:
- *                 type: string
+ *                 example: Jane Doe
+ *               age:
+ *                 type: integer
+ *                 example: 30
  *     responses:
  *       200:
- *         description: Doctor added
+ *         description: Patient updated
+ *   delete:
+ *     summary: Delete patient
+ *     tags: [Patients]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Patient deleted
  */
+
+/**
+ * @swagger
+ * /api/doctors:
+ *   get:
+ *     summary: Get all doctors
+ *     tags: [Doctors]
+ *     responses:
+ *       200:
+ *         description: List of all doctors
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                   name:
+ *                     type: string
+ *                   specialty:
+ *                     type: string
+ *   post:
+ *     summary: Add a new doctor
+ *     tags: [Doctors]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - specialty
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Dr. Smith
+ *               specialty:
+ *                 type: string
+ *                 example: Cardiology
+ *     responses:
+ *       200:
+ *         description: Doctor added successfully
+ */
+
 /**
  * @swagger
  * /api/doctors/{id}:
@@ -121,7 +197,6 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
  *         required: true
  *         schema:
  *           type: integer
- *         description: Doctor ID
  *     requestBody:
  *       required: true
  *       content:
@@ -131,12 +206,13 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
  *             properties:
  *               name:
  *                 type: string
+ *                 example: Dr. Johnson
  *               specialty:
  *                 type: string
+ *                 example: Neurology
  *     responses:
  *       200:
  *         description: Doctor updated
- *
  *   delete:
  *     summary: Delete doctor
  *     tags: [Doctors]
@@ -146,43 +222,16 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
  *         required: true
  *         schema:
  *           type: integer
- *         description: Doctor ID
  *     responses:
  *       200:
  *         description: Doctor deleted
  */
-/**
- * @swagger
- * /api/appointments:
- *   get:
- *     summary: Get all appointments
- *     tags: [Appointments]
- *     responses:
- *       200:
- *         description: Success
- *   post:
- *     summary: Create appointment
- *     tags: [Appointments]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               patient_id:
- *                 type: integer
- *               doctor_id:
- *                 type: integer
- *     responses:
- *       200:
- *         description: Appointment created
- */
+
 /**
  * @swagger
  * /api/doctors/{id}/availability:
  *   get:
- *     summary: Get doctor availability
+ *     summary: Check doctor availability
  *     tags: [Doctors]
  *     parameters:
  *       - in: path
@@ -193,7 +242,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
  *         description: Doctor ID
  *     responses:
  *       200:
- *         description: Doctor availability
+ *         description: Doctor availability status
  *         content:
  *           application/json:
  *             schema:
@@ -206,6 +255,57 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
  *                 message:
  *                   type: string
  */
+
+/**
+ * @swagger
+ * /api/appointments:
+ *   get:
+ *     summary: Get all appointments
+ *     tags: [Appointments]
+ *     responses:
+ *       200:
+ *         description: List of all appointments
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                   patient_id:
+ *                     type: integer
+ *                   doctor_id:
+ *                     type: integer
+ *   post:
+ *     summary: Create a new appointment
+ *     tags: [Appointments]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - patient_id
+ *               - doctor_id
+ *             properties:
+ *               patient_id:
+ *                 type: integer
+ *                 example: 1
+ *               doctor_id:
+ *                 type: integer
+ *                 example: 1
+ *     responses:
+ *       200:
+ *         description: Appointment created
+ *       400:
+ *         description: Invalid patient or doctor ID
+ *       500:
+ *         description: Service error
+ */
+
 /**
  * @swagger
  * /api/appointments/{id}:
@@ -218,7 +318,6 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
  *         required: true
  *         schema:
  *           type: integer
- *         description: Appointment ID
  *     requestBody:
  *       required: true
  *       content:
@@ -233,7 +332,6 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
  *     responses:
  *       200:
  *         description: Appointment updated
- *
  *   delete:
  *     summary: Delete appointment
  *     tags: [Appointments]
@@ -243,11 +341,11 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
  *         required: true
  *         schema:
  *           type: integer
- *         description: Appointment ID
  *     responses:
  *       200:
  *         description: Appointment deleted
  */
+
 /**
  * @swagger
  * /api/records:
@@ -256,9 +354,22 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
  *     tags: [Records]
  *     responses:
  *       200:
- *         description: Success
+ *         description: List of all records
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                   patient_id:
+ *                     type: integer
+ *                   diagnosis:
+ *                     type: string
  *   post:
- *     summary: Add medical record
+ *     summary: Add a new medical record
  *     tags: [Records]
  *     requestBody:
  *       required: true
@@ -266,43 +377,16 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - patient_id
+ *               - diagnosis
  *             properties:
  *               patient_id:
  *                 type: integer
+ *                 example: 1
  *               diagnosis:
  *                 type: string
- *     responses:
- *       200:
- *         description: Record added
- */
-/**
- * @swagger
- * /api/history:
- *   get:
- *     summary: Get full history (patient, doctor, appointment, record)
- *     tags: [Records]
- *     responses:
- *       200:
- *         description: Success
- */
-
-/**
- * @swagger
- * /api/records:
- *   post:
- *     summary: Add medical record
- *     tags: [Records]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               patient_id:
- *                 type: integer
- *               diagnosis:
- *                 type: string
+ *                 example: Hypertension
  *     responses:
  *       200:
  *         description: Record added
@@ -312,7 +396,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
  * @swagger
  * /api/records/{id}:
  *   get:
- *     summary: Get record by ID
+ *     summary: Get medical record by ID
  *     tags: [Records]
  *     parameters:
  *       - in: path
@@ -322,10 +406,9 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
  *           type: integer
  *     responses:
  *       200:
- *         description: Success
- *
+ *         description: Record data
  *   put:
- *     summary: Update record
+ *     summary: Update medical record
  *     tags: [Records]
  *     parameters:
  *       - in: path
@@ -347,9 +430,8 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
  *     responses:
  *       200:
  *         description: Record updated
- *
  *   delete:
- *     summary: Delete record
+ *     summary: Delete medical record
  *     tags: [Records]
  *     parameters:
  *       - in: path
@@ -362,7 +444,33 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
  *         description: Record deleted
  */
 
-// 🔁 ROUTING KE SERVICE
+/**
+ * @swagger
+ * /api/history:
+ *   get:
+ *     summary: Get full history (patient, doctor, appointment, diagnosis)
+ *     tags: [Records]
+ *     responses:
+ *       200:
+ *         description: Combined history data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   patient_name:
+ *                     type: string
+ *                   doctor_name:
+ *                     type: string
+ *                   appointment_id:
+ *                     type: integer
+ *                   diagnosis:
+ *                     type: string
+ */
+
+// ROUTING KE SERVICES
 app.use('/api/patients', createProxyMiddleware({
   target: 'http://localhost:3001',
   changeOrigin: true
@@ -383,8 +491,14 @@ app.use('/api/records', createProxyMiddleware({
   changeOrigin: true
 }));
 
+// Fixed: /api/history was missing — proxied to medical-record-service
+app.use('/api/history', createProxyMiddleware({
+  target: 'http://localhost:3004',
+  changeOrigin: true
+}));
 
-// 🚀 RUN SERVER
+// RUN SERVER
 app.listen(3000, () => {
   console.log('API Gateway running on port 3000');
+  console.log('Swagger docs: http://localhost:3000/api-docs');
 });

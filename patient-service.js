@@ -14,7 +14,7 @@ const db = mysql.createConnection({
 // GET ALL
 app.get('/api/patients', (req, res) => {
   db.query('SELECT * FROM patients', (err, result) => {
-    if (err) throw err;
+    if (err) return res.status(500).send(err);
     res.json(result);
   });
 });
@@ -22,6 +22,7 @@ app.get('/api/patients', (req, res) => {
 // GET BY ID
 app.get('/api/patients/:id', (req, res) => {
   db.query('SELECT * FROM patients WHERE id=?', [req.params.id], (err, result) => {
+    if (err) return res.status(500).send(err);
     res.json(result[0]);
   });
 });
@@ -29,9 +30,43 @@ app.get('/api/patients/:id', (req, res) => {
 // CREATE
 app.post('/api/patients', (req, res) => {
   const { name, age } = req.body;
-  db.query('INSERT INTO patients (name, age) VALUES (?, ?)', [name, age], () => {
-    res.json({ message: 'Patient added' });
-  });
+  db.query(
+    'INSERT INTO patients (name, age) VALUES (?, ?)',
+    [name, age],
+    (err) => {
+      if (err) return res.status(500).send(err);
+      res.json({ message: 'Patient added' });
+    }
+  );
 });
 
-app.listen(3001, () => console.log('Patient Service running'));
+// UPDATE — was missing
+app.put('/api/patients/:id', (req, res) => {
+  const id = req.params.id;
+  const { name, age } = req.body;
+
+  db.query(
+    'UPDATE patients SET name=?, age=? WHERE id=?',
+    [name, age, id],
+    (err) => {
+      if (err) return res.status(500).send(err);
+      res.json({ message: 'Patient updated' });
+    }
+  );
+});
+
+// DELETE — was missing
+app.delete('/api/patients/:id', (req, res) => {
+  const id = req.params.id;
+
+  db.query(
+    'DELETE FROM patients WHERE id=?',
+    [id],
+    (err) => {
+      if (err) return res.status(500).send(err);
+      res.json({ message: 'Patient deleted' });
+    }
+  );
+});
+
+app.listen(3001, () => console.log('Patient Service running on port 3001'));

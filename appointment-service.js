@@ -12,7 +12,7 @@ const db = mysql.createConnection({
   database: 'db_healthcare'
 });
 
-// GET APPOINTMENTS
+// GET ALL APPOINTMENTS
 app.get('/api/appointments', (req, res) => {
   db.query('SELECT * FROM appointments', (err, result) => {
     if (err) return res.status(500).send(err);
@@ -32,38 +32,8 @@ app.post('/api/appointments', async (req, res) => {
     const doctor = await axios.get(`http://localhost:3002/api/doctors/${doctor_id}`);
 
     if (!patient.data || !doctor.data) {
-      return res.status(400).json({ message: 'Invalid data' });
+      return res.status(400).json({ message: 'Invalid patient or doctor data' });
     }
-
-
-    //UPDATE
-app.put('/api/appointments/:id', (req, res) => {
-  const id = req.params.id;
-  const { patient_id, doctor_id } = req.body;
-
-  db.query(
-    'UPDATE appointments SET patient_id=?, doctor_id=? WHERE id=?',
-    [patient_id, doctor_id, id],
-    (err) => {
-      if (err) return res.status(500).send(err);
-      res.json({ message: 'Appointment updated' });
-    }
-  );
-});
-
-// DELETE
-app.delete('/api/appointments/:id', (req, res) => {
-  const id = req.params.id;
-
-  db.query(
-    'DELETE FROM appointments WHERE id=?',
-    [id],
-    (err) => {
-      if (err) return res.status(500).send(err);
-      res.json({ message: 'Appointment deleted' });
-    }
-  );
-});
 
     // INSERT KE DB
     db.query(
@@ -78,6 +48,35 @@ app.delete('/api/appointments/:id', (req, res) => {
   } catch (err) {
     res.status(500).json({ message: 'Service error', error: err.message });
   }
+});
+
+// UPDATE APPOINTMENT
+app.put('/api/appointments/:id', (req, res) => {
+  const id = req.params.id;
+  const { patient_id, doctor_id } = req.body;
+
+  db.query(
+    'UPDATE appointments SET patient_id=?, doctor_id=? WHERE id=?',
+    [patient_id, doctor_id, id],
+    (err) => {
+      if (err) return res.status(500).send(err);
+      res.json({ message: 'Appointment updated' });
+    }
+  );
+});
+
+// DELETE APPOINTMENT
+app.delete('/api/appointments/:id', (req, res) => {
+  const id = req.params.id;
+
+  db.query(
+    'DELETE FROM appointments WHERE id=?',
+    [id],
+    (err) => {
+      if (err) return res.status(500).send(err);
+      res.json({ message: 'Appointment deleted' });
+    }
+  );
 });
 
 app.listen(3003, () => console.log('Appointment Service running on port 3003'));
