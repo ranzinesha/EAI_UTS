@@ -11,6 +11,14 @@ const db = mysql.createConnection({
   database: 'db_healthcare'
 });
 
+db.connect((err) => {
+  if (err) {
+    console.error('❌ DB gagal konek:', err.message);
+    process.exit(1); // stop service kalau DB gagal
+  }
+  console.log('✅ DB Connected!');
+});
+
 // GET ALL
 app.get('/api/patients', (req, res) => {
   db.query('SELECT * FROM patients', (err, result) => {

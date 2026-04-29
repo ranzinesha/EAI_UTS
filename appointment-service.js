@@ -23,19 +23,12 @@ app.get('/api/appointments', (req, res) => {
 // CREATE APPOINTMENT + VALIDASI
 app.post('/api/appointments', async (req, res) => {
   const { patient_id, doctor_id } = req.body;
-
   try {
-    // VALIDASI PATIENT
     const patient = await axios.get(`http://localhost:3001/api/patients/${patient_id}`);
-
-    // VALIDASI DOCTOR
     const doctor = await axios.get(`http://localhost:3002/api/doctors/${doctor_id}`);
-
     if (!patient.data || !doctor.data) {
       return res.status(400).json({ message: 'Invalid patient or doctor data' });
     }
-
-    // INSERT KE DB
     db.query(
       'INSERT INTO appointments (patient_id, doctor_id) VALUES (?, ?)',
       [patient_id, doctor_id],
@@ -44,7 +37,6 @@ app.post('/api/appointments', async (req, res) => {
         res.json({ message: 'Appointment created' });
       }
     );
-
   } catch (err) {
     res.status(500).json({ message: 'Service error', error: err.message });
   }
@@ -54,7 +46,6 @@ app.post('/api/appointments', async (req, res) => {
 app.put('/api/appointments/:id', (req, res) => {
   const id = req.params.id;
   const { patient_id, doctor_id } = req.body;
-
   db.query(
     'UPDATE appointments SET patient_id=?, doctor_id=? WHERE id=?',
     [patient_id, doctor_id, id],
@@ -68,7 +59,6 @@ app.put('/api/appointments/:id', (req, res) => {
 // DELETE APPOINTMENT
 app.delete('/api/appointments/:id', (req, res) => {
   const id = req.params.id;
-
   db.query(
     'DELETE FROM appointments WHERE id=?',
     [id],

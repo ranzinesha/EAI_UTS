@@ -5,10 +5,7 @@ const swaggerJsdoc = require('swagger-jsdoc');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const app = express();
-app.use(cors({
-  origin: '*'
-}));
-app.use(express.json());
+app.use(cors({ origin: '*' }));
 
 // SWAGGER CONFIG
 const options = {
@@ -474,29 +471,58 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 // ROUTING KE SERVICES
 app.use('/api/patients', createProxyMiddleware({
-  target: 'http://localhost:3001',
-  changeOrigin: true
+  target: 'http://localhost:3001/api/patients',
+  changeOrigin: true,
+  pathRewrite: { '^/api/patients': '' },
+  on: {
+    error: (err, req, res) => {
+      res.status(502).json({ error: 'Patient service unavailable' });
+    }
+  }
 }));
 
 app.use('/api/doctors', createProxyMiddleware({
-  target: 'http://localhost:3002',
-  changeOrigin: true
+  target: 'http://localhost:3002/api/doctors',
+  changeOrigin: true,
+  pathRewrite: { '^/api/doctors': '' },
+  on: {
+    error: (err, req, res) => {
+      res.status(502).json({ error: 'Doctor service unavailable' });
+    }
+  }
 }));
 
 app.use('/api/appointments', createProxyMiddleware({
-  target: 'http://localhost:3003',
-  changeOrigin: true
+  target: 'http://localhost:3003/api/appointments',
+  changeOrigin: true,
+  pathRewrite: { '^/api/appointments': '' },
+  on: {
+    error: (err, req, res) => {
+      res.status(502).json({ error: 'Appointment service unavailable' });
+    }
+  }
 }));
 
 app.use('/api/records', createProxyMiddleware({
-  target: 'http://localhost:3004',
-  changeOrigin: true
+  target: 'http://localhost:3004/api/records',
+  changeOrigin: true,
+  pathRewrite: { '^/api/records': '' },
+  on: {
+    error: (err, req, res) => {
+      res.status(502).json({ error: 'Medical record service unavailable' });
+    }
+  }
 }));
 
-// Fixed: /api/history was missing — proxied to medical-record-service
 app.use('/api/history', createProxyMiddleware({
-  target: 'http://localhost:3004',
-  changeOrigin: true
+  target: 'http://localhost:3004/api/history',
+  changeOrigin: true,
+  pathRewrite: { '^/api/history': '' },
+  on: {
+    error: (err, req, res) => {
+      res.status(502).json({ error: 'Medical record service unavailable' });
+    }
+  }
 }));
 
 // RUN SERVER
